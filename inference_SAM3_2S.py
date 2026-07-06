@@ -1,24 +1,30 @@
 import os
 import cv2
 import numpy as np
+import argparse
 from ultralytics.models.sam import SAM3SemanticPredictor
 
 # ------------------------------------ #
 #             CONFIGURATION
 # ------------------------------------ #
 
-IMAGE_FOLDER  = 'imgs/inputs'
-OUTPUT_DIR = 'imgs/inputs_pred'
+# Parse arguments
+parser = argparse.ArgumentParser(description="Argument parser for IPS-Seg.")
+parser.add_argument("--in_dir", type=str, default='imgs/inputs', help="Input folder")
+parser.add_argument("--out_dir", type=str, default='imgs/inputs_pred', help="Output folder")
+parser.add_argument("--model_path", type=str, default='models/sam3.pt', help="Model path")
+parser.add_argument("--sam3_conf", type=float, default=0.25, help="SAM3 confidence threshold")
+parser.add_argument("--prompts", default=["drone", "uav", "flying drone", "quadcopter", "unmanned aerial vehicle"], help="Context prompts")
+args = parser.parse_args()
 
-TEXT_PROMPTS = ["drone", "uav", "flying drone", "quadcopter", "unmanned aerial vehicle"]
-SUPPORTED_EXTS = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
-
-SAM3_MODEL_PATH = "models/sam3.pt"
-SAM3_CONF = 0.25
+IMAGE_FOLDER  = args.in_dir
+OUTPUT_DIR = args.out_dir
+TEXT_PROMPTS = args.prompts
+SAM3_MODEL_PATH = args.model_path
+SAM3_CONF = args.sam3_conf
 
 MIN_BBOX_AREA = 50
 PADDING = 20 
-
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # ------------------------------------ #
@@ -56,6 +62,7 @@ sam3_overrides = dict(
 sam3_predictor = SAM3SemanticPredictor(overrides=sam3_overrides)
 
 # Get all image files
+SUPPORTED_EXTS = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
 all_files = [f for f in os.listdir(IMAGE_FOLDER) if os.path.splitext(f)[1].lower() in SUPPORTED_EXTS]
 
 
