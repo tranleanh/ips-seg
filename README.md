@@ -1,11 +1,10 @@
 # IPS-Seg
 
+[![Preprint](https://img.shields.io/badge/Preprint-arXiv-red)](https://arxiv.org/html/2607.03754v1)
+
 Exploring SAM Supervision for Fine-Grained UAV Target Segmentation under Data Scarcity
 
 Author: Le-Anh Tran
-
-(to be updated)
-
 
 ## Framework
 
