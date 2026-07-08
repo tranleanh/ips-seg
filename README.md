@@ -7,10 +7,10 @@ Exploring SAM Supervision for Fine-Grained UAV Target Segmentation under Data Sc
 Author: Le-Anh Tran
 
 ## Framework
-
 (to be updated)
 
-## Inference: Two-stage SAM3
+## Inference
+### Two-stage SAM3
 - Download SAM3 weight file from [facebook/sam3](https://huggingface.co/facebook/sam3) and save it in "models".
 - Run two-stage SAM3 (SAM3_2S) on input folder "imgs/inputs" and save results to "imgs/inputs_pred":
 ```bashrc
@@ -18,11 +18,14 @@ python inference_SAM3_2S.py --in_dir imgs/inputs --out_dir imgs/inputs_pred
 ```
 - See more options in [inference_SAM3_2S.py](https://github.com/tranleanh/ips-seg/blob/main/inference_SAM3_2S.py)
 
-## Inference: Two-stage IPS-Seg
+### Two-stage IPS-Seg
 - Run two-stage IPS-Seg (IPS-Seg_2S):
 ```bashrc
 (to be updated)
 ```
+
+## Training
+(to be updated)
 
 ## Results
 
