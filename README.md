@@ -10,7 +10,7 @@ Author: Le-Anh Tran
 ## Framework
 
 <p align="center">
-<img src="docs/ipsseg_framework" width="888">
+<img src="docs/ipsseg_framework.png" width="888">
 </p>
 
 ## Inference
