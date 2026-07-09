@@ -1,19 +1,25 @@
 import os
 import cv2
-import numpy as np
+import logging
 import argparse
+import numpy as np
+
+from nets import utils
 from ultralytics.models.sam import SAM3SemanticPredictor
+
 
 # ------------------------------------ #
 #             CONFIGURATION
 # ------------------------------------ #
+logging.getLogger("ultralytics").disabled = True
 
 # Parse arguments
-parser = argparse.ArgumentParser(description="Argument parser for IPS-Seg.")
+parser = argparse.ArgumentParser(description="Argument parser for SAM3.")
 parser.add_argument("--in_dir", type=str, default='imgs/inputs', help="Input folder")
 parser.add_argument("--out_dir", type=str, default='imgs/inputs_pred', help="Output folder")
 parser.add_argument("--model_path", type=str, default='models/sam3.pt', help="Model path")
 parser.add_argument("--sam3_conf", type=float, default=0.25, help="SAM3 confidence threshold")
+parser.add_argument("--save_crop", type=bool, default=False, help="Saving cropped patches")
 parser.add_argument("--prompts", default=["drone", "uav", "flying drone", "quadcopter", "unmanned aerial vehicle"], help="Context prompts")
 args = parser.parse_args()
 
@@ -22,34 +28,17 @@ OUTPUT_DIR = args.out_dir
 TEXT_PROMPTS = args.prompts
 SAM3_MODEL_PATH = args.model_path
 SAM3_CONF = args.sam3_conf
+SAVE_CROP = args.save_crop
 
 MIN_BBOX_AREA = 50
 PADDING = 20 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# ------------------------------------ #
-#              HELPERS
-# ------------------------------------ #
-def get_bboxes(mask, min_area=50):
-    num_labels, _, stats, _ = cv2.connectedComponentsWithStats(mask, connectivity=8)
-    bboxes = []
-    for i in range(1, num_labels):
-        if stats[i, cv2.CC_STAT_AREA] < min_area:
-            continue
-        x, y = stats[i, cv2.CC_STAT_LEFT], stats[i, cv2.CC_STAT_TOP]
-        w, h = stats[i, cv2.CC_STAT_WIDTH], stats[i, cv2.CC_STAT_HEIGHT]
-        bboxes.append([x, y, x + w, y + h])
-    return bboxes
-
-def apply_sharpening(img):
-    kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
-    return cv2.filter2D(img, -1, kernel)
-
 
 # ------------------------------------ #
-#          PIPELINE EXECUTION
+#               EXECUTION
 # ------------------------------------ #
-print("Initializing SAM3 model...")
+print("Initializing SAM3...")
 sam3_overrides = dict(
     conf=SAM3_CONF, 
     task="segment", 
@@ -57,16 +46,17 @@ sam3_overrides = dict(
     model=SAM3_MODEL_PATH, 
     half=True,    # Set to False if running on CPU
     device="cuda", # Explicitly forcing GPU execution
-    save=False  
+    save=False,
+    verbose=False
 )
 sam3_predictor = SAM3SemanticPredictor(overrides=sam3_overrides)
+print("SAM3 initialized successfully!")
 
 # Get all image files
 SUPPORTED_EXTS = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
 all_files = [f for f in os.listdir(IMAGE_FOLDER) if os.path.splitext(f)[1].lower() in SUPPORTED_EXTS]
 
-
-print("\nStarting evaluation...")
+print("\nStarting inference...")
 for idx, filename in enumerate(all_files, 1):
     image_path = os.path.join(IMAGE_FOLDER, filename)
     filename_mask = filename.replace('jpg', 'png')
@@ -92,11 +82,11 @@ for idx, filename in enumerate(all_files, 1):
                 coarse_mask = cv2.bitwise_or(coarse_mask, m_np)
 
     # Save coarse mask
-    cv2.imwrite(os.path.join(OUTPUT_DIR, f"{fname}_mask_coarse.png"), coarse_mask)
+    cv2.imwrite(os.path.join(OUTPUT_DIR, f"{fname}_sam3.png"), coarse_mask)
 
     # ---------------------------------------------------------------
     # STAGE 2: Crop and Refine
-    bboxes = get_bboxes(coarse_mask, min_area=MIN_BBOX_AREA)
+    bboxes = utils.get_bboxes(coarse_mask, min_area=MIN_BBOX_AREA)
     final_mask = np.zeros((h_img, w_img), dtype=np.uint8)
 
     for b_idx, bbox in enumerate(bboxes):
@@ -112,7 +102,8 @@ for idx, filename in enumerate(all_files, 1):
         cv2.imwrite(temp_path, crop)
 
         # Save crop
-        cv2.imwrite(os.path.join(OUTPUT_DIR, f"{fname}_p{b_idx}.jpg"), crop)
+        if SAVE_CROP:
+            cv2.imwrite(os.path.join(OUTPUT_DIR, f"{fname}_p{b_idx}.jpg"), crop)
 
         sam3_predictor.set_image(temp_path)
         refined_results = sam3_predictor(text=TEXT_PROMPTS)
@@ -129,7 +120,8 @@ for idx, filename in enumerate(all_files, 1):
                     current_crop_mask = cv2.bitwise_or(current_crop_mask, m_c)
 
         # Save predited mask for the crop
-        cv2.imwrite(os.path.join(OUTPUT_DIR, f"{fname}_p{b_idx}_mask.png"), current_crop_mask)
+        if SAVE_CROP:
+            cv2.imwrite(os.path.join(OUTPUT_DIR, f"{fname}_p{b_idx}_mask.png"), current_crop_mask)
 
         # Map back to final global mask
         final_mask[y1_p:y2_p, x1_p:x2_p] = cv2.bitwise_or(final_mask[y1_p:y2_p, x1_p:x2_p], current_crop_mask)
@@ -140,7 +132,6 @@ for idx, filename in enumerate(all_files, 1):
     print(f"Processed {idx}/{len(all_files)}: {filename}")
 
     # Save fine mask
-    cv2.imwrite(os.path.join(OUTPUT_DIR, f"{fname}_mask_fine.png"), pred_mask)
+    cv2.imwrite(os.path.join(OUTPUT_DIR, f"{fname}_sam3_2s.png"), pred_mask)
 
-    # if idx > 10:
-    #     break
+print(f'Outputs saved to {OUTPUT_DIR}')
