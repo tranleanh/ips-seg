@@ -1,27 +1,40 @@
 # IPS-Seg
 
 [![Preprint](https://img.shields.io/badge/Preprint-arXiv-red)](https://arxiv.org/html/2607.03754v1)
+[![Models](https://img.shields.io/badge/Model-Hugging_Face-gold)](https://huggingface.co/tranleanh/ips-seg)
 
 Exploring SAM Supervision for Fine-Grained UAV Target Segmentation under Data Scarcity
 
 Author: Le-Anh Tran
 
 ## Framework
-(to be updated)
+
+<p align="center">
+<img src="docs/ipsseg_framework" width="888">
+</p>
 
 ## Inference
-### Two-stage SAM3
-- Download SAM3 weight file from [facebook/sam3](https://huggingface.co/facebook/sam3) and save it in "models".
-- Run two-stage SAM3 (SAM3_2S) on input folder "imgs/inputs" and save results to "imgs/inputs_pred":
+### Setup
+- Clone the repository:
 ```bashrc
-python inference_SAM3_2S.py --in_dir imgs/inputs --out_dir imgs/inputs_pred
+git clone https://github.com/tranleanh/ips-seg
+```
+- Create env and install dependencies:
+```bashrc
+pip install -r requirements.txt
+```
+### SAM3 (ultralytics)
+- Download SAM3 weight file from [facebook/sam3](https://huggingface.co/facebook/sam3) and place it in "models".
+- Run SAM3 (1/2-stage) on input folder "imgs/inputs" and save results to "imgs/outputs_sam3":
+```bashrc
+python inference_SAM3_2S.py --in_dir imgs/inputs --out_dir imgs/outputs_sam3
 ```
 - See more options in [inference_SAM3_2S.py](https://github.com/tranleanh/ips-seg/blob/main/inference_SAM3_2S.py)
-
-### Two-stage IPS-Seg
-- Run two-stage IPS-Seg (IPS-Seg_2S):
+### IPS-Seg
+- Download model file from [tranleanh/ips-seg](https://huggingface.co/tranleanh/ips-seg) and place it in "models".
+- Run IPS-Seg (1/2-stage) on input folder "imgs/inputs" and save results to "imgs/outputs_ipsseg":
 ```bashrc
-(to be updated)
+python inference_IPSSeg.py --in_dir imgs/inputs --out_dir imgs/outputs_ipsseg
 ```
 
 ## Training
@@ -35,7 +48,12 @@ python inference_SAM3_2S.py --in_dir imgs/inputs --out_dir imgs/inputs_pred
 
 ## Citation
 ```bibtex
-(to be updated)
+@article{tran2026ipsseg,
+  title={Exploring SAM supervision for fine-grained UAV target segmentation under data scarcity},
+  author={Tran, Le-Anh},
+  journal={arXiv preprint arXiv:2607.03754},
+  year={2026}
+}
 ```
 
 Have fun!
