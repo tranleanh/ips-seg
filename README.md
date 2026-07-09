@@ -15,25 +15,29 @@ Author: Le-Anh Tran
 
 ## Inference
 ### Setup
-- Clone the repository:
-```bashrc
+```bash
+# Clone this repo
 git clone https://github.com/tranleanh/ips-seg
-```
-- Create env and install dependencies:
-```bashrc
+cd ips-seg
+
+# Create env and activate it
+conda create -n ipsseg python=3.10
+conda activate ipsseg
+
+# Install dependencies
 pip install -r requirements.txt
 ```
 ### SAM3 (ultralytics)
 - Download SAM3 weight file from [facebook/sam3](https://huggingface.co/facebook/sam3) and place it in "models".
 - Run SAM3 (1/2-stage) on input folder "imgs/inputs" and save results to "imgs/outputs_sam3":
-```bashrc
+```bash
 python inference_SAM3_2S.py --in_dir imgs/inputs --out_dir imgs/outputs_sam3
 ```
 - See more options in [inference_SAM3_2S.py](https://github.com/tranleanh/ips-seg/blob/main/inference_SAM3_2S.py)
 ### IPS-Seg
 - Download model file from [tranleanh/ips-seg](https://huggingface.co/tranleanh/ips-seg) and place it in "models".
 - Run IPS-Seg (1/2-stage) on input folder "imgs/inputs" and save results to "imgs/outputs_ipsseg":
-```bashrc
+```bash
 python inference_IPSSeg.py --in_dir imgs/inputs --out_dir imgs/outputs_ipsseg
 ```
 
@@ -55,7 +59,6 @@ python inference_IPSSeg.py --in_dir imgs/inputs --out_dir imgs/outputs_ipsseg
   year={2026}
 }
 ```
-
 Have fun!
 
 LA Tran
