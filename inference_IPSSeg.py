@@ -19,12 +19,14 @@ parser = argparse.ArgumentParser(description="Argument parser for IPS-Seg.")
 parser.add_argument("--in_dir", type=str, default='imgs/inputs', help="Input folder")
 parser.add_argument("--out_dir", type=str, default='imgs/outputs_ipsseg', help="Output folder")
 parser.add_argument("--model_path", type=str, default='models/ipsseg_2s.pth', help="Model path")
+parser.add_argument("--conf", type=float, default=0.50, help="IPS-Seg confidence threshold")
 args = parser.parse_args()
 
 
 IMAGE_FOLDER  = args.in_dir
 OUTPUT_DIR = args.out_dir
 MODEL_PATH = args.model_path
+CONF_THR = args.conf
 
 IMG_SIZE = 256
 MIN_BBOX_AREA = 50
@@ -85,7 +87,7 @@ for idx, filename in enumerate(all_files, 1):
     coarse_mask = pred_np.copy()
 
     # Save coarse mask
-    final_coarse_mask = np.where(coarse_mask > 128, 255, 0).astype(np.uint8)
+    final_coarse_mask = np.where(coarse_mask > int(CONF_THR*255), 255, 0).astype(np.uint8)
     cv2.imwrite(os.path.join(OUTPUT_DIR, f"{fname}_ipsseg.png"), final_coarse_mask)
 
     # ---------------------------------------------------------------
@@ -116,8 +118,7 @@ for idx, filename in enumerate(all_files, 1):
 
         final_mask[y1_p:y2_p, x1_p:x2_p] = cv2.bitwise_or(final_mask[y1_p:y2_p, x1_p:x2_p], pred_np)
 
-
-    pred_mask = np.where(final_mask > 128, 255, 0).astype(np.uint8)
+    pred_mask = np.where(final_mask > int(CONF_THR*255), 255, 0).astype(np.uint8)
     # ---------------------------------------------------------------
 
     pred_path = os.path.join(OUTPUT_DIR, f'{fname}_ipsseg2s.png')
