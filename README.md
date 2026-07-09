@@ -31,16 +31,16 @@ pip install -r requirements.txt
 - Download SAM3 weight file from [facebook/sam3](https://huggingface.co/facebook/sam3) and place it in "models".
 - Run SAM3 (1/2-stage) on input folder "imgs/inputs" and save results to "imgs/outputs_sam3":
 ```bash
-python inference_SAM3_2S.py --in_dir imgs/inputs --out_dir imgs/outputs_sam3
+python inference_SAM3.py --in_dir imgs/inputs --out_dir imgs/outputs_sam3
 ```
-- See more options in [inference_SAM3_2S.py](https://github.com/tranleanh/ips-seg/blob/main/inference_SAM3_2S.py)
+- See more arguments in [inference_SAM3.py](https://github.com/tranleanh/ips-seg/blob/main/inference_SAM3.py)
 ### IPS-Seg
 - Download model file from [tranleanh/ips-seg](https://huggingface.co/tranleanh/ips-seg) and place it in "models".
 - Run IPS-Seg (1/2-stage) on input folder "imgs/inputs" and save results to "imgs/outputs_ipsseg":
 ```bash
 python inference_IPSSeg.py --in_dir imgs/inputs --out_dir imgs/outputs_ipsseg
 ```
-
+- See more arguments in [inference_IPSSeg.py](https://github.com/tranleanh/ips-seg/blob/main/inference_IPSSeg.py)
 ## Training
 (to be updated)
 
