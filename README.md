@@ -41,8 +41,15 @@ python inference_SAM3.py --in_dir imgs/inputs --out_dir imgs/outputs_sam3
 python inference_IPSSeg.py --in_dir imgs/inputs --out_dir imgs/outputs_ipsseg
 ```
 - See more arguments in [inference_IPSSeg.py](https://github.com/tranleanh/ips-seg/blob/main/inference_IPSSeg.py)
+- 
 ## Training
-(to be updated)
+- Prepare image and mask folders, each input-mask pair must have the same file name.
+- Specify data paths in [train.py](https://github.com/tranleanh/ips-seg/blob/main/train.py): "volumes_path" & "labels_path".
+- Specify other configurations in [train.py](https://github.com/tranleanh/ips-seg/blob/main/train.py).
+- Run training code:
+```bash
+python train.py
+```
 
 ## Results
 
